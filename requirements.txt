@@ -1,0 +1,8 @@
+jieba
+requests
+streamlit
+streamlit-echarts
+beautifulsoup4
+wordcloud
+matplotlib
+pandas
