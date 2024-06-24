@@ -19,7 +19,7 @@ def preprocess_text(text):
 # 分词函数
 def word_segmentation(text):
     stopwords = set(
-        ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日', '月','转发','收藏','取消','类','年','请','微信','其他'])
+        ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日', '月'])
     text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
     words = jieba.lcut(text)
     return [word for word in words if word not in stopwords]
@@ -78,6 +78,9 @@ def main():
                 st.write(f"获取第 {page} 页内容成功")
 
                 text = extract_main_text(html_content)
+                st.write(f"第 {page} 页提取的正文文本：")
+                st.text_area(f"第 {page} 页正文文本", text[:500], height=200)  # 显示前500字符
+
                 all_text += text
 
             except Exception as e:
