@@ -12,7 +12,6 @@ import os
 
 # 清理和预处理文本函数
 def preprocess_text(text):
-    # 合并去除空白字符、换行符、标点符号和数字的步骤
     text = re.sub(r'\s+', '', text)  # 去除空白字符
     text = re.sub(r'[\n\r]', '', text)  # 去除换行符
     text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
@@ -29,10 +28,8 @@ def word_segmentation(text):
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
-    content = soup.select('.search-result-item')  # 修改选择器以匹配实际页面结构
-    if content:
-        return ' '.join([c.get_text() for c in content])
-    return soup.get_text()
+    content = soup.get_text()
+    return content
 
 # 生成词云图
 def generate_wordcloud(word_counts):
@@ -78,7 +75,7 @@ def main():
                 st.write(f"获取第 {page} 页内容成功")
 
                 text = extract_main_text(html_content)
-                st.text_area(f"第 {page} 页提取的正文文本：", text, height=200)
+                st.text_area(f"第 {page} 页提取的正文文本（前1000个字符）：", text[:1000], height=200)
                 all_text += text
 
             except Exception as e:
