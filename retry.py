@@ -91,13 +91,22 @@ def main():
         if all_text:
             st.write("所有页内容合并成功")
 
+            # 显示合并后的原始文本
+            st.text_area("合并后的原始文本：", all_text[:500], height=200)
+
             # 移除噪音后的文本
             text_noise_removed = remove_noise(all_text)
             st.text_area("去除噪音后的文本：", text_noise_removed[:500], height=200)
 
             # 预处理文本
-            text_preprocessed = preprocess_text(text_noise_removed)
+            text_preprocessed = preprocess_text(all_text)  # 使用原始文本进行预处理
             st.text_area("预处理后的文本：", text_preprocessed[:500], height=200)
+
+            # 确保两个步骤后的文本一致
+            if text_noise_removed == text_preprocessed:
+                st.write("去除噪音后的文本和预处理后的文本一致")
+            else:
+                st.write("去除噪音后的文本和预处理后的文本不一致")
 
             words = word_segmentation(text_preprocessed)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
