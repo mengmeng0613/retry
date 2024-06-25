@@ -69,7 +69,7 @@ def main():
         all_text = ""
 
         for page in range(1, num_pages + 1):
-            url = f"{base_url}{page}"
+            url = f"{base_url}&page={page}"
             try:
                 response = requests.get(url)
                 response.encoding = 'utf-8'
@@ -78,9 +78,7 @@ def main():
                 st.write(f"获取第 {page} 页内容成功")
 
                 text = extract_main_text(html_content)
-                st.write(f"第 {page} 页提取的正文文本：")
-                st.text_area(f"第 {page} 页正文文本", text[:500], height=200)  # 显示前500字符
-
+                # 不再显示提取的正文文本界面
                 all_text += text
 
             except Exception as e:
