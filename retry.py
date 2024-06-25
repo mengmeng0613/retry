@@ -59,39 +59,26 @@ def main():
 
     st.title("欢迎使用 Streamlit 文本处理 📝")
 
-    base_url = st.text_input('请输入待爬取的URL :')
-    num_pages = st.number_input('请输入要爬取的页数:', min_value=1, value=20)
+    url = st.text_input('请输入待爬取的URL :')
 
-    if base_url:
-        all_text = ""
-
+    if url:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Cache-Control': 'no-cache'
         }
 
-        for page in range(1, num_pages + 1):
-            url = f"{base_url}&page={page}"
-            st.write(f"构建的URL: {url}")  # 调试信息
-            try:
-                response = requests.get(url, headers=headers)
-                response.encoding = 'utf-8'
-                html_content = response.text
+        try:
+            response = requests.get(url, headers=headers)
+            response.encoding = 'utf-8'
+            html_content = response.text
 
-                st.write(f"获取第 {page} 页内容成功")
+            st.write("获取页面内容成功")
 
-                text = extract_main_text(html_content)
-                st.text_area(f"第 {page} 页提取的正文文本（前1000个字符）：", text[:1000], height=200)
-                all_text += text
-
-            except Exception as e:
-                st.error(f"爬取第 {page} 页时出现错误: {e}")
-
-        if all_text:
-            st.write("所有页内容合并成功")
+            text = extract_main_text(html_content)
+            st.text_area("提取的正文文本（前1000个字符）：", text[:1000], height=200)
 
             # 预处理文本
-            text_preprocessed = preprocess_text(all_text)
+            text_preprocessed = preprocess_text(text)
             st.text_area("预处理后的文本：", text_preprocessed[:1000], height=200)
 
             words = word_segmentation(text_preprocessed)
@@ -124,6 +111,9 @@ def main():
                 generate_wordcloud(dict(most_common_words))
             else:
                 st.write("没有足够的词语生成可视化图表。")
+
+        except Exception as e:
+            st.error(f"爬取页面时出现错误: {e}")
 
 if __name__ == "__main__":
     main()
