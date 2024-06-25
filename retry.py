@@ -14,20 +14,16 @@ import os
 def preprocess_text(text):
     text = re.sub(r'\s+', '', text)  # 去除空白字符
     text = re.sub(r'[\n\r]', '', text)  # 去除换行符
+    text = re.sub(r'[' + string.punctuation + ']+', '', text)  # 去除标点符号
+    text = re.sub(r'\d+', '', text)  # 去除数字
     return text.strip()
 
 # 分词函数
 def word_segmentation(text):
     stopwords = set(
         ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日', '月', '转发', '收藏', '取消', '类', '年', '请', '微信', '其他'])
-    text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
     words = jieba.lcut(text)
     return [word for word in words if word not in stopwords]
-
-# 移除标点和数字
-def remove_noise(text):
-    text = re.sub(r'[' + string.punctuation + ']+', '', text)
-    return re.sub(r'\d+', '', text)
 
 # 提取正文文本
 def extract_main_text(html):
@@ -69,7 +65,7 @@ def main():
         all_text = ""
 
         for page in range(1, num_pages + 1):
-            url = f"{base_url}{page}"
+            url = f"{base_url}&page={page}"
             try:
                 response = requests.get(url)
                 response.encoding = 'utf-8'
@@ -86,19 +82,9 @@ def main():
         if all_text:
             st.write("所有页内容合并成功")
 
-            # 移除噪音后的文本
-            text_noise_removed = remove_noise(all_text)
-            st.write("去除噪音后的文本：", text_noise_removed[:500])
-
-            # 预处理文本
-            text_preprocessed = preprocess_text(text_noise_removed)
+            # 预处理文本（去除噪音和预处理步骤合并）
+            text_preprocessed = preprocess_text(all_text)
             st.write("预处理后的文本：", text_preprocessed[:500])
-
-            # 确保两个步骤后的文本一致
-            if text_noise_removed == text_preprocessed:
-                st.write("去除噪音后的文本和预处理后的文本一致")
-            else:
-                st.write("去除噪音后的文本和预处理后的文本不一致")
 
             words = word_segmentation(text_preprocessed)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
