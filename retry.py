@@ -25,6 +25,11 @@ def word_segmentation(text):
     words = jieba.lcut(text)
     return [word for word in words if word not in stopwords]
 
+# 移除标点和数字
+def remove_noise(text):
+    text = re.sub(r'[' + string.punctuation + ']+', '', text)
+    return re.sub(r'\d+', '', text)
+
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
@@ -86,8 +91,12 @@ def main():
         if all_text:
             st.write("所有页内容合并成功")
 
+            # 移除噪音后的文本
+            text_noise_removed = remove_noise(all_text)
+            st.text_area("去除噪音后的文本：", text_noise_removed[:500], height=200)
+
             # 预处理文本
-            text_preprocessed = preprocess_text(all_text)
+            text_preprocessed = preprocess_text(text_noise_removed)
             st.text_area("预处理后的文本：", text_preprocessed[:500], height=200)
 
             words = word_segmentation(text_preprocessed)
