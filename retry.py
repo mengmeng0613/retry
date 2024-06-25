@@ -10,37 +10,29 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import os
 
-
 # 清理文本函数
 def preprocess_text(text):
     text = re.sub(r'\s+', '', text)  # 去除空白字符
     text = re.sub(r'[\n\r]', '', text)  # 去除换行符
     return text.strip()
 
-
-# 去除噪音函数
-def remove_noise(text):
-    text = re.sub(r'[' + string.punctuation + ']+', '', text)  # 去除标点符号
-    return re.sub(r'\d+', '', text)  # 去除数字
-
-
 # 分词函数
 def word_segmentation(text):
     stopwords = set(
-        ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日',
-         '月'])
+        ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日', '月'])
+    text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
     words = jieba.lcut(text)
     return [word for word in words if word not in stopwords]
 
+# 移除标点和数字
+def remove_noise(text):
+    text = re.sub(r'[' + string.punctuation + ']+', '', text)
+    return re.sub(r'\d+', '', text)
 
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
-    content = soup.select('.search-result-item')
-    if content:
-        return ' '.join([c.get_text() for c in content])
-    return ""
-
+    return soup.get_text()
 
 # 生成词云图
 def generate_wordcloud(word_counts):
@@ -61,7 +53,6 @@ def generate_wordcloud(word_counts):
     else:
         st.write("没有足够的词语生成词云图。")
 
-
 # 运行主程序
 def main():
     st.set_page_config(
@@ -71,14 +62,14 @@ def main():
 
     st.title("欢迎使用 Streamlit 文本处理 📝")
 
-    base_url = st.text_input('请输入基础 URL :')
+    base_url = st.text_input('请输入基础 URL (例如: http://example.com/articles?page=):')
     num_pages = st.number_input('请输入要爬取的页数:', min_value=1, value=20)
 
     if base_url:
         all_text = ""
 
         for page in range(1, num_pages + 1):
-            url = f"{base_url}&page={page}"
+            url = f"{base_url}{page}"
             try:
                 response = requests.get(url)
                 response.encoding = 'utf-8'
@@ -86,15 +77,7 @@ def main():
 
                 st.write(f"获取第 {page} 页内容成功")
 
-                # 输出获取到的HTML内容以便调试
-                st.text_area(f"第 {page} 页的HTML内容：", html_content[:1000], height=200)
-
                 text = extract_main_text(html_content)
-                if not text:
-                    st.write(f"第 {page} 页没有提取到内容，请检查选择器。")
-                else:
-                    st.write(f"第 {page} 页提取到的正文内容：", text[:500])  # 仅展示前500字符
-
                 all_text += text
 
             except Exception as e:
@@ -103,13 +86,13 @@ def main():
         if all_text:
             st.write("所有页内容合并成功")
 
-            text_noise_removed = remove_noise(all_text)
-            st.write("去除噪音后的文本：", text_noise_removed[:500])
+            text = remove_noise(all_text)
+            st.write("去除噪音后的文本：", text[:500])
 
-            text_preprocessed = preprocess_text(text_noise_removed)
-            st.write("预处理后的文本：", text_preprocessed[:500])
+            text = preprocess_text(text)
+            st.write("预处理后的文本：", text[:500])
 
-            words = word_segmentation(text_preprocessed)
+            words = word_segmentation(text)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
 
             word_count = Counter(words)
@@ -139,7 +122,6 @@ def main():
                 generate_wordcloud(dict(most_common_words))
             else:
                 st.write("没有足够的词语生成可视化图表。")
-
 
 if __name__ == "__main__":
     main()
