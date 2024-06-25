@@ -28,12 +28,13 @@ def word_segmentation(text):
 # 移除标点和数字
 def remove_noise(text):
     text = re.sub(r'[' + string.punctuation + ']+', '', text)
-    return re.sub(r'\d+', '', text)
+    text = re.sub(r'\d+', '', text)
+    return text
 
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
-    content = soup.select('.search-result-item')  # 修改选择器以匹配实际页面结构
+    content = soup.select('.search-result-item')
     if content:
         return ' '.join([c.get_text() for c in content])
     return soup.get_text()
@@ -90,8 +91,6 @@ def main():
 
         if all_text:
             st.write("所有页内容合并成功")
-
-            # 显示合并后的原始文本
             st.text_area("合并后的原始文本：", all_text[:500], height=200)
 
             # 移除噪音后的文本
@@ -99,14 +98,8 @@ def main():
             st.text_area("去除噪音后的文本：", text_noise_removed[:500], height=200)
 
             # 预处理文本
-            text_preprocessed = preprocess_text(all_text)  # 使用原始文本进行预处理
+            text_preprocessed = preprocess_text(text_noise_removed)
             st.text_area("预处理后的文本：", text_preprocessed[:500], height=200)
-
-            # 确保两个步骤后的文本一致
-            if text_noise_removed == text_preprocessed:
-                st.write("去除噪音后的文本和预处理后的文本一致")
-            else:
-                st.write("去除噪音后的文本和预处理后的文本不一致")
 
             words = word_segmentation(text_preprocessed)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
