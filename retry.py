@@ -10,23 +10,28 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import os
 
+
 # 清理文本函数
 def preprocess_text(text):
     text = re.sub(r'\s+', '', text)  # 去除空白字符
     text = re.sub(r'[\n\r]', '', text)  # 去除换行符
     return text.strip()
 
+
 # 去除噪音函数
 def remove_noise(text):
     text = re.sub(r'[' + string.punctuation + ']+', '', text)  # 去除标点符号
     return re.sub(r'\d+', '', text)  # 去除数字
 
+
 # 分词函数
 def word_segmentation(text):
     stopwords = set(
-        ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日', '月'])
+        ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日',
+         '月'])
     words = jieba.lcut(text)
     return [word for word in words if word not in stopwords]
+
 
 # 提取正文文本
 def extract_main_text(html):
@@ -35,6 +40,7 @@ def extract_main_text(html):
     if content:
         return ' '.join([c.get_text() for c in content])
     return ""
+
 
 # 生成词云图
 def generate_wordcloud(word_counts):
@@ -54,6 +60,7 @@ def generate_wordcloud(word_counts):
             st.error(f"生成词云图时出现错误: {e}")
     else:
         st.write("没有足够的词语生成词云图。")
+
 
 # 运行主程序
 def main():
@@ -79,7 +86,15 @@ def main():
 
                 st.write(f"获取第 {page} 页内容成功")
 
+                # 输出获取到的HTML内容以便调试
+                st.text_area(f"第 {page} 页的HTML内容：", html_content[:1000], height=200)
+
                 text = extract_main_text(html_content)
+                if not text:
+                    st.write(f"第 {page} 页没有提取到内容，请检查选择器。")
+                else:
+                    st.write(f"第 {page} 页提取到的正文内容：", text[:500])  # 仅展示前500字符
+
                 all_text += text
 
             except Exception as e:
@@ -124,6 +139,7 @@ def main():
                 generate_wordcloud(dict(most_common_words))
             else:
                 st.write("没有足够的词语生成可视化图表。")
+
 
 if __name__ == "__main__":
     main()
