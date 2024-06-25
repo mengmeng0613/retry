@@ -32,6 +32,13 @@ def remove_noise(text):
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
+    # 尝试通过常见的标签提取正文
+    possible_selectors = ['article', 'main', '.content', '.post', '.article', '.entry-content']
+    for selector in possible_selectors:
+        content = soup.select(selector)
+        if content:
+            return ' '.join([c.get_text() for c in content])
+    # 如果常见标签未找到，返回整个文本
     return soup.get_text()
 
 # 生成词云图
@@ -62,7 +69,7 @@ def main():
 
     st.title("欢迎使用 Streamlit 文本处理 📝")
 
-    base_url = st.text_input('请输入基础 URL (例如: http://example.com/articles?page=):')
+    base_url = st.text_input('请输入基础 URL :')
     num_pages = st.number_input('请输入要爬取的页数:', min_value=1, value=20)
 
     if base_url:
