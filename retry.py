@@ -32,13 +32,13 @@ def remove_noise(text):
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
-    # 尝试通过常见的标签提取正文
     possible_selectors = ['article', 'main', '.content', '.post', '.article', '.entry-content']
     for selector in possible_selectors:
         content = soup.select(selector)
         if content:
+            st.write(f"使用选择器 '{selector}' 提取正文内容。")
             return ' '.join([c.get_text() for c in content])
-    # 如果常见标签未找到，返回整个文本
+    st.write("未找到合适的选择器，返回整个页面的文本。")
     return soup.get_text()
 
 # 生成词云图
