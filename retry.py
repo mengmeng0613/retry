@@ -12,6 +12,7 @@ import os
 
 # 清理和预处理文本函数
 def preprocess_text(text):
+    # 合并去除空白字符、换行符、标点符号和数字的步骤
     text = re.sub(r'\s+', '', text)  # 去除空白字符
     text = re.sub(r'[\n\r]', '', text)  # 去除换行符
     text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
@@ -25,16 +26,10 @@ def word_segmentation(text):
     words = jieba.lcut(text)
     return [word for word in words if word not in stopwords]
 
-# 移除标点和数字
-def remove_noise(text):
-    text = re.sub(r'[' + string.punctuation + ']+', '', text)
-    text = re.sub(r'\d+', '', text)
-    return text
-
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
-    content = soup.select('.search-result-item')
+    content = soup.select('.search-result-item')  # 修改选择器以匹配实际页面结构
     if content:
         return ' '.join([c.get_text() for c in content])
     return soup.get_text()
@@ -91,14 +86,9 @@ def main():
 
         if all_text:
             st.write("所有页内容合并成功")
-            st.text_area("合并后的原始文本：", all_text[:500], height=200)
-
-            # 移除噪音后的文本
-            text_noise_removed = remove_noise(all_text)
-            st.text_area("去除噪音后的文本：", text_noise_removed[:500], height=200)
 
             # 预处理文本
-            text_preprocessed = preprocess_text(text_noise_removed)
+            text_preprocessed = preprocess_text(all_text)
             st.text_area("预处理后的文本：", text_preprocessed[:500], height=200)
 
             words = word_segmentation(text_preprocessed)
