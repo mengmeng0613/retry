@@ -19,7 +19,7 @@ def preprocess_text(text):
 # 分词函数
 def word_segmentation(text):
     stopwords = set(
-        ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日', '月','转发','收藏','取消','类','年','请','微信','其他'])
+        ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日', '月', '转发', '收藏', '取消', '类', '年', '请', '微信', '其他'])
     text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
     words = jieba.lcut(text)
     return [word for word in words if word not in stopwords]
@@ -86,13 +86,21 @@ def main():
         if all_text:
             st.write("所有页内容合并成功")
 
-            text = remove_noise(all_text)
-            st.write("去除噪音后的文本：", text[:500])
+            # 移除噪音后的文本
+            text_noise_removed = remove_noise(all_text)
+            st.write("去除噪音后的文本：", text_noise_removed[:500])
 
-            text = preprocess_text(text)
-            st.write("预处理后的文本：", text[:500])
+            # 预处理文本
+            text_preprocessed = preprocess_text(text_noise_removed)
+            st.write("预处理后的文本：", text_preprocessed[:500])
 
-            words = word_segmentation(text)
+            # 确保两个步骤后的文本一致
+            if text_noise_removed == text_preprocessed:
+                st.write("去除噪音后的文本和预处理后的文本一致")
+            else:
+                st.write("去除噪音后的文本和预处理后的文本不一致")
+
+            words = word_segmentation(text_preprocessed)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
 
             word_count = Counter(words)
