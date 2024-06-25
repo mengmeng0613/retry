@@ -67,6 +67,7 @@ def main():
 
         for page in range(1, num_pages + 1):
             url = f"{base_url}&page={page}"
+            st.write(f"构建的URL: {url}")  # 调试信息
             try:
                 response = requests.get(url)
                 response.encoding = 'utf-8'
