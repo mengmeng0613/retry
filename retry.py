@@ -62,7 +62,7 @@ def main():
 
     st.title("欢迎使用 Streamlit 文本处理 📝")
 
-    base_url = st.text_input('请输入基础 URL :')
+    base_url = st.text_input('请输入待爬取的URL :')
     num_pages = st.number_input('请输入要爬取的页数:', min_value=1, value=20)
 
     if base_url:
