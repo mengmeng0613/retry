@@ -1,13 +1,14 @@
+import jieba
 import requests
 import streamlit as st
+from streamlit_echarts import st_echarts
+from collections import Counter
 from bs4 import BeautifulSoup
 import re
-import jieba
-from collections import Counter
+import string
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import os
-from streamlit_echarts import st_echarts
 
 # 清理文本函数
 def preprocess_text(text):
@@ -31,11 +32,7 @@ def remove_noise(text):
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
-    # 根据页面结构提取内容
-    content = soup.select('.search-result-item')  # 修改选择器以匹配实际页面结构
-    if content:
-        return ' '.join([c.get_text() for c in content])
-    return ""
+    return soup.get_text()
 
 # 生成词云图
 def generate_wordcloud(word_counts):
@@ -72,7 +69,7 @@ def main():
         all_text = ""
 
         for page in range(1, num_pages + 1):
-            url = f"{base_url}&page={page}"  # 修改以匹配实际分页结构
+            url = f"{base_url}{page}"
             try:
                 response = requests.get(url)
                 response.encoding = 'utf-8'
