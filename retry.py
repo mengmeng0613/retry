@@ -65,11 +65,16 @@ def main():
     if base_url:
         all_text = ""
 
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Cache-Control': 'no-cache'
+        }
+
         for page in range(1, num_pages + 1):
             url = f"{base_url}&page={page}"
             st.write(f"构建的URL: {url}")  # 调试信息
             try:
-                response = requests.get(url)
+                response = requests.get(url, headers=headers)
                 response.encoding = 'utf-8'
                 html_content = response.text
 
