@@ -16,23 +16,25 @@ def preprocess_text(text):
     text = re.sub(r'[\n\r]', '', text)  # 去除换行符
     return text.strip()
 
+# 去除噪音函数
+def remove_noise(text):
+    text = re.sub(r'[' + string.punctuation + ']+', '', text)  # 去除标点符号
+    return re.sub(r'\d+', '', text)  # 去除数字
+
 # 分词函数
 def word_segmentation(text):
     stopwords = set(
         ['的', '了', '在', '是', '我', '你', '他', '她', '它', '们', '这', '那', '之', '与', '和', '或', '虽然', '但是', '然而', '因此', '日', '月'])
-    text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
     words = jieba.lcut(text)
     return [word for word in words if word not in stopwords]
-
-# 移除标点和数字
-def remove_noise(text):
-    text = re.sub(r'[' + string.punctuation + ']+', '', text)
-    return re.sub(r'\d+', '', text)
 
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
-    return soup.get_text()
+    content = soup.select('.search-result-item')
+    if content:
+        return ' '.join([c.get_text() for c in content])
+    return ""
 
 # 生成词云图
 def generate_wordcloud(word_counts):
@@ -78,7 +80,6 @@ def main():
                 st.write(f"获取第 {page} 页内容成功")
 
                 text = extract_main_text(html_content)
-                # 不再显示提取的正文文本界面
                 all_text += text
 
             except Exception as e:
@@ -87,13 +88,13 @@ def main():
         if all_text:
             st.write("所有页内容合并成功")
 
-            text = remove_noise(all_text)
-            st.write("去除噪音后的文本：", text[:500])
+            text_noise_removed = remove_noise(all_text)
+            st.write("去除噪音后的文本：", text_noise_removed[:500])
 
-            text = preprocess_text(text)
-            st.write("预处理后的文本：", text[:500])
+            text_preprocessed = preprocess_text(text_noise_removed)
+            st.write("预处理后的文本：", text_preprocessed[:500])
 
-            words = word_segmentation(text)
+            words = word_segmentation(text_preprocessed)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
 
             word_count = Counter(words)
