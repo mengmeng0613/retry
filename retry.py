@@ -10,11 +10,11 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import os
 
-# 清理文本函数
+# 清理和预处理文本函数
 def preprocess_text(text):
     text = re.sub(r'\s+', '', text)  # 去除空白字符
     text = re.sub(r'[\n\r]', '', text)  # 去除换行符
-    text = re.sub(r'[' + string.punctuation + ']+', '', text)  # 去除标点符号
+    text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
     text = re.sub(r'\d+', '', text)  # 去除数字
     return text.strip()
 
@@ -28,6 +28,9 @@ def word_segmentation(text):
 # 提取正文文本
 def extract_main_text(html):
     soup = BeautifulSoup(html, 'html.parser')
+    content = soup.select('.search-result-item')  # 修改选择器以匹配实际页面结构
+    if content:
+        return ' '.join([c.get_text() for c in content])
     return soup.get_text()
 
 # 生成词云图
@@ -74,6 +77,7 @@ def main():
                 st.write(f"获取第 {page} 页内容成功")
 
                 text = extract_main_text(html_content)
+                st.text_area(f"第 {page} 页提取的正文文本：", text, height=200)
                 all_text += text
 
             except Exception as e:
@@ -82,9 +86,9 @@ def main():
         if all_text:
             st.write("所有页内容合并成功")
 
-            # 预处理文本（去除噪音和预处理步骤合并）
+            # 预处理文本
             text_preprocessed = preprocess_text(all_text)
-            st.write("预处理后的文本：", text_preprocessed[:500])
+            st.text_area("预处理后的文本：", text_preprocessed[:500], height=200)
 
             words = word_segmentation(text_preprocessed)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
