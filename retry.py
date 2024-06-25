@@ -12,6 +12,7 @@ import os
 
 # 清理和预处理文本函数
 def preprocess_text(text):
+    # 合并去除空白字符、换行符、标点符号和数字的步骤
     text = re.sub(r'\s+', '', text)  # 去除空白字符
     text = re.sub(r'[\n\r]', '', text)  # 去除换行符
     text = re.sub(r'[^\w\s]', '', text)  # 去除标点符号
@@ -42,15 +43,7 @@ def generate_wordcloud(word_counts):
             return
 
         try:
-            wordcloud = WordCloud(
-                font_path=font_path,
-                width=800,
-                height=400,
-                max_font_size=80,
-                relative_scaling=0.5,
-                collocations=False,
-                margin=2
-            ).generate_from_frequencies(word_counts)
+            wordcloud = WordCloud(font_path=font_path, width=800, height=400).generate_from_frequencies(word_counts)
             plt.figure(figsize=(10, 5))
             plt.imshow(wordcloud, interpolation='bilinear')
             plt.axis('off')
@@ -96,7 +89,7 @@ def main():
 
             # 预处理文本
             text_preprocessed = preprocess_text(all_text)
-            st.text_area("预处理后的文本：", text_preprocessed[:500], height=200)
+            st.text_area("预处理后的文本：", text_preprocessed[:1000], height=200)
 
             words = word_segmentation(text_preprocessed)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
