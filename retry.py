@@ -75,13 +75,11 @@ def main():
             st.write("获取页面内容成功")
 
             text = extract_main_text(html_content)
-            st.write("提取的正文文本：")
-            st.write(text)
+            st.text_area("提取的正文文本（前1500个字符）：", text[:1500], height=200)
 
             # 预处理文本
             text_preprocessed = preprocess_text(text)
-            st.write("预处理后的文本：")
-            st.write(text_preprocessed)
+            st.text_area("预处理后的文本：", text_preprocessed[:1500], height=200)
 
             words = word_segmentation(text_preprocessed)
             st.write("分词结果：", words[:50])  # 仅展示前50个词
